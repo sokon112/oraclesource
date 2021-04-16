@@ -138,3 +138,37 @@ select employee_id,hire_date,add_months(hire_date,120)from employees;
 
 select * from employees
 where add_months(hire_date,160)>sysdate;
+
+
+
+--test4
+select last_name,salary,
+    case
+        when salary<1999 then 0
+        when salary between 2000 and 3999 then 0.09
+        when salary between 4000 and 5999 then 0.2
+        when salary between 6000 and 7999 then 0.3
+        when salary between 8000 and 9999 then 0.4
+        when salary between 10000 and 11999 then 0.42
+        when salary between 12000 and 13999 then 0.44
+        else 0.45
+    end as tax_rate
+from employees where department_id=80;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
