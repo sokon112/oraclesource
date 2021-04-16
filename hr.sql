@@ -155,8 +155,27 @@ select last_name,salary,
     end as tax_rate
 from employees where department_id=80;
 
+--test5
+select count(distinct manager_id) as mg from employees;
 
+--test6
+select department_id,count(employee_id) as howmany 
+from employees group by department_id
+order by department_id;
 
+--test7
+select department_id,round(avg(salary)) as avrage from employees
+group by department_id order by department_id;
+
+--test8
+select job_id,count(job_id)as howmany from employees
+group by job_id;
+
+--test
+select manager_id, min(salary) from employees
+group by manager_id
+having manager_id is not null and min(salary)>=6000
+order by min(salary) desc;
 
 
 

@@ -7,6 +7,7 @@ select * from bonus;
 -- emp ���̺��� ��� ���� ��ȸ
 select * from emp;
 
+select * from dept;
 -- emp ���̺��� empno, ename ��ȸ
 select empno,ename from emp;
 
@@ -368,14 +369,106 @@ select deptno,round(avg(sal)) from emp group by deptno;
 
 select deptno,job,avg(sal) from emp group by deptno,job order by deptno,job;
 
+select deptno,job,avg(sal) from emp 
+group by deptno,job having avg(sal)>=2000;
+
+--test
+select deptno, job, avg(sal) from emp group by deptno, job having avg(sal)>=500
+order by deptno,job;
+
+--test
+select deptno,round(avg(sal)), max(sal),min(sal),count(empno)
+from emp group by deptno;
+
+--test;
+select job,count(job) from emp
+group by job having count(job)>=3;
+
+--test
+select deptno, to_char(hiredate,'yyyy')as hireyear, count(*)
+from emp group by deptno, to_char(hiredate,'yyyy');
 
 
 
 
 
 
+select deptno,job,avg(sal)
+from emp
+group by deptno,job having avg(sal)>=2000
+order by deptno,job;
+
+select deptno,job,avg(sal)
+from emp where sal<=3000
+group by deptno,job having avg(sal)>=2000
+order by deptno,job;
+
+--join test
+--같으면 => 등가조인 : E.deptno = D.deptno
+select empno,ename,E.sal,E.deptno,D.dname
+from emp E,dept D
+where E.deptno = D.deptno and E.sal>=2500 and E.empno<=9999;
+
+--그외 => 비 등가조인
+select E.empno,E.ename,E.job,E.sal,E.mgr,E.comm,E.deptno,S.grade
+from emp E,salgrade S
+where sal between S.losal and S.hisal;
+
+select *
+from emp E,salgrade S
+where sal between S.losal and S.hisal;
+
+--self join: 자기 자신 내 조인 하고 싶은 내용이 있는 경우 사용
+select E1.empno, E1.ename, E1.mgr, E2.empno as mgr_empno, E2.ename as mgr_ename
+from emp E1, emp E2
+where E1.mgr = E2.empno;
+
+--OUTER join
+--left outer join : table1.col1 = table2.col1(+)
+select E1.empno, E1.ename, E1.mgr, E2.empno as mgr_empno, E2.ename as mgr_ename
+from emp E1, emp E2
+where E1.mgr = E2.empno(+);
+
+--right outer join : table1.col1(+) = table2.col1
+select E1.empno, E1.ename, E1.mgr, E2.empno as mgr_empno, E2.ename as mgr_ename
+from emp E1, emp E2
+where E1.mgr(+) = E2.empno;
+
+--full outer join : 표준 코드 방식활용
+
+--표준 grammer join
+--NATURAL JOIN( ==join, ex] E1.mgr = E2.empno)
+select E.empno,E.ename,E.sal,deptno,D.dname
+from emp E natural join dept D
+order by deptno, E.empno;
+--join~on
+select E.empno,E.ename,E.sal,E.deptno,D.dname
+from emp E join dept D on E.deptno = D.deptno
+order by deptno, E.empno;
+--Outer join~on
+select E1.empno, E1.ename, E1.mgr, E2.empno as mgr_empno, E2.ename as mgr_ename
+from emp E1 left outer join emp E2 on E1.mgr = E2.empno
+order by E1.empno;
+--full outer join
+select E1.empno, E1.ename, E1.mgr, E2.empno as mgr_empno, E2.ename as mgr_ename
+from emp E1 full outer join emp E2 on E1.mgr = E2.empno
+order by E1.empno;
 
 
+--test
+select e.deptno,d.dname,round(avg(e.sal))as avgsal
+    ,max(e.sal)as maxsal,min(e.sal)as minsal,count(e.empno)as count
+from emp E, dept D 
+where e.deptno = d.deptno group by e.deptno,d.dname;
+
+--test
+select d.deptno,d.dname,e.empno,e.ename,e.job,e.sal
+from dept d left outer join emp e on d.deptno = e.deptno;
+
+--test
+select e.deptno,d.dname,e.empno,e.ename,e.sal
+from emp e join dept d on e.sal>2000 
+order by e.deptno,e.sal;
 
 
 
