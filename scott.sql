@@ -471,6 +471,82 @@ from emp e join dept d on e.sal>2000
 order by e.deptno,e.sal;
 
 
+--ex
+select d.deptno,d.dname,e.empno,e.ename,e.job,e.mgr,e.sal,
+    s.losal,s.hisal,s.grade,e2.empno as mgr_empno,e2.ename as mgr_ename
+from emp e, dept d, salgrade s,emp e2
+where e.deptno(+) = d.deptno 
+and e.sal between s.losal(+) and s.hisal(+)
+and e.mgr = e2.empno(+)
+order by d.deptno,e.ename;
+
+--ex2
+select d.deptno,d.dname,e.empno,e.ename,e.job,e.mgr,e.sal,
+    s.losal,s.hisal,s.grade,e2.empno as mgr_empno,e2.ename as mgr_ename
+from emp e right outer join dept d on e.deptno = d.deptno
+        left outer join salgrade s on e.sal between s.losal and s.hisal
+        left outer join emp e2 on e.mgr = e2.empno
+order by d.deptno,e.ename;
+
+
+--sub query
+select sal from emp where ename='JONES';
+select * from emp where sal > 2975;
+-- transfrom this one to use sub query
+select * from emp where sal > (select sal from emp where ename='JONES');
+
+--s.q 2
+select * from emp where comm > (select comm from emp where ename ='ALLEN');
+
+--s.q 3
+select * from emp where hiredate < 
+(select hiredate from emp where ename ='WARD');
+
+
+--s.q(inLine View : use sub query in "FROM" line)
+-- you must give name for InLineView
+select e10.empno, e10.ename, e10.deptno, d.dname, d.loc
+from (select * from emp where deptno=10) e10,
+     (select * from dept) d
+    where e10.deptno = d.deptno;
+    
+--s.q(Scala sub query : use sub query in "SELECT" line)
+select empno, ename, job, sal,
+    (select grade 
+     from salgrade 
+     where e.sal between losal and hisal) as salgrade,
+    deptno,
+    (select dname
+     from dept
+     where e.deptno = dept.deptno) as dname
+from emp e;
+
+
+--s.q ex
+--teachers code
+select e1.empno, e1.ename, e1.job, e1.deptno, d1.dname, d1.loc
+from emp e1, dept d1
+where e1.deptno = d1.deptno 
+and e1.deptno = 10
+and e1.job not in (select job from emp where deptno =30);
+
+--s.q ex
+select empno, ename, sal, 
+    (select grade 
+     from salgrade 
+     where e1.sal between losal and hisal) as grade
+from emp e1
+where sal >(select max(sal) from emp where job= 'SALESMAN');
+--use all(any/all)
+select empno, ename, sal, 
+    (select grade 
+     from salgrade 
+     where e1.sal between losal and hisal) as grade
+from emp e1
+where sal > all(select sal from emp where job= 'SALESMAN');
+
+    
+
 
 
 

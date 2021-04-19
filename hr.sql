@@ -1,5 +1,11 @@
 select * from employees;
 
+select * from tab;
+
+select * from locations;
+
+select * from departments;
+
 select first_name,last_name,job_id from employees;
 
 select last_name,job_id from employees where employee_id =176;
@@ -177,6 +183,100 @@ group by manager_id
 having manager_id is not null and min(salary)>=6000
 order by min(salary) desc;
 
+
+--join ex1
+select e1.hire_date, e1.last_name, e1.manager_id
+from employees e1, employees e2
+where e1.manager_id = e2.employee_id
+and e1.hire_date < e2.hire_date;
+
+select e1.hire_date, e1.last_name, e1.manager_id
+from employees e1 join employees e2 on e1.manager_id = e2.employee_id
+and e1.hire_date < e2.hire_date;
+
+--join ex2
+select e.employee_id,e.last_name,d.department_id,l.city
+from employees e, departments d, locations l
+where e.department_id = d.department_id
+    and d.location_id = l.location_id
+    and l.city like 'S%';
+    
+--join ex3
+select e.employee_id,e.last_name,d.department_id, e.salary
+from employees e, departments d
+where e.department_id = d.department_id
+    and d.location_id = 1700;
+    
+--join ex4
+select d.department_name,d.location_id,count(*),round(avg(e.salary),2)
+from employees e, departments d
+where e.department_id = d.department_id
+group by d.department_name,d.location_id;
+
+--join ex5
+select e.department_id, e.last_name, e.job_id
+from employees e, departments d
+where e.department_id = d.department_id
+and d.department_name = 'Executive';
+
+--join ex6
+select e1.department_id, e1.first_name ||' '|| e1.last_name as name
+from employees e1, employees e2
+where e1.department_id = e2.department_id
+and e1.salary<e2.salary
+and e1.hire_date<e2.hire_date
+order by e1.department_id;
+
+
+--sub query ex(InLineView)
+select 
+    last_name,avg_sal,e2.department_id,e2.salary
+from (select department_id, round(avg(salary))as avg_sal
+        from employees group by department_id) e1,
+     employees e2
+where e1.department_id = e2.department_id
+and e2.salary < e1.avg_sal
+order by department_id desc, salary desc;
+
+--s.q1
+select last_name,job_id,salary
+from employees e1,
+    (select max(salary)as saman_max from employees where job_id = 'SA_MAN') e2
+where e1.salary > e2.saman_max;
+
+--s.q2
+select last_name, department_id, salary
+from employees e1,
+    (select ;
+    
+--s.q3
+select e1.last_name, e1.hire_date
+from employees e1,
+    (select hire_date from employees where last_name = 'Davies') e2
+where e1.hire_date > e2.hire_date;
+
+--s.q4
+select e1.last_name,e1.salary
+from employees e1,
+    (select employee_id from employees where last_name = 'King') e2
+where e1.manager_id = e2.employee_id;
+
+--s.q5
+select e1.employee_id,e1.hire_date
+from employees e1,
+    (select department_id from employees where last_name = '') e2
+where e1.manager_id = e2.employee_id;
+
+--s.q6
+select e1.last_name, e1.department_id,e1.salary,e1.commission_pct
+from employees e1,
+    (select salary,nvl(commission_pct,0)as commit 
+     from employees 
+     where last_name = 'Kochhar') e2
+where e1.salary = e2.salary
+and nvl(e1.commission_pct,0) = e2.commit
+and last_name != 'Kochhar';
+    
 
 
 
