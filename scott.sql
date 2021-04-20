@@ -7,6 +7,8 @@ select * from bonus;
 -- emp ���̺��� ��� ���� ��ȸ
 select * from emp;
 
+select * from salgrade;
+
 select * from dept;
 -- emp ���̺��� empno, ename ��ȸ
 select empno,ename from emp;
@@ -545,6 +547,25 @@ select empno, ename, sal,
 from emp e1
 where sal > all(select sal from emp where job= 'SALESMAN');
 
+create table emp_temp as select * from emp where 1<>1;
+
+select * from emp_temp;
+--insert ex
+insert into emp_temp(empno,ename,job,mgr,hiredate,sal,comm,deptno)
+select e.empno,e.ename,e.job, e.mgr, e.hiredate,e.sal,e.comm,e.deptno
+from emp e, salgrade s
+where e.sal between s.losal and s.hisal
+and s.grade = 1;
+
+
+create table dept_temp as select * from dept;
+
+select * from dept_temp;
+
+insert into dept_temp(deptno,dname,loc) values(50,'web',null);
+
+
+commit;
     
 
 
