@@ -566,13 +566,274 @@ insert into dept_temp(deptno,dname,loc) values(50,'web',null);
 
 
 commit;
+--2021.04.20
+
+
+select * from dept_temp;
+
+
+--update all values of  in table
+update dept_temp
+set loc = 'Seoul';
+Rollback;
     
+update dept_temp
+set loc = 'Seoul'
+where deptno = 50;
+
+select
+    *
+from emp_temp;
+
+
+update emp_temp
+set comm = 50
+where sal < 1000;
+
+
+
+create table dept_temp2 as select * from dept;
+
+select * from dept_temp2;
+
+update dept_temp2
+set(dname,loc)=(select dname,loc
+                from dept
+                where deptno=40)
+where deptno=30;
+rollback;
+
+
+update dept_temp2
+set loc = 'Seoul'
+where deptno = (select deptno
+                from dept_temp2
+                where dname='OPERATIONS');
+
+create table emp_temp2 as select * from emp;
+
+select * from emp_temp2;
+
+delete from emp_temp2
+where job='MANAGER';
+
+rollback;
+
+--use sub query
+delete from emp_temp2
+where empno in
+(select e.empno
+ from emp_temp2 e, salgrade s 
+ where e.sal between s.losal and s.hisal
+ and s.grade = 3 and e.deptno = 30);
+ 
+ 
+delete from emp_temp2
+where sal>=5000;
+
+
+
+--test ~
+create table exam_emp as select * from emp;
+create table exam_dept as select * from dept;
+create table exam_salgrade as select * from salgrade;
+
+select * from exam_emp;
+delete from exam_emp where empno = 7201;
+
+insert into exam_emp values(7201,'TEST_USER1','MANAGER',7788,'2016/01/02',4500,null,50);
+insert into exam_emp values(7202,'TEST_USER2','CLERK',7201,'2016/02/21',1800,null,50);
+insert into exam_emp values(7203,'TEST_USER3','ANALYST',7201,'2016/04/11',3400,null,60);
+insert into exam_emp values(7204,'TEST_USER4','SALESMAN',7201,'2016/05/31',2700,300,60);
+insert into exam_emp values(7205,'TEST_USER5','CLERK',7201,'2016/07/20',2600,null,70);
+insert into exam_emp values(7206,'TEST_USER6','CLERK',7201,'2016/09/08',2600,null,70);
+insert into exam_emp values(7207,'TEST_USER7','LECTURER',7201,'2016/10/28',2300,null,80);
+insert into exam_emp values(7208,'TEST_USER8','STUDENT',7201,'2018/03/09',1200,null,80);
+
+commit;
+select * from exam_emp;
+select * from exam_emp where deptno=60;
+select * from exam_emp where deptno=80;
+rollback;
+
+update exam_emp
+set deptno = 70
+where sal>
+(select avg(sal) as avg_sal from exam_emp where deptno = 50)
+and deptno=50;
+
+update exam_emp
+set sal = sal*1.1,deptno = 80
+where empno in (
+ select empno 
+ from exam_emp 
+ where deptno=60 and hiredate=(select min(hiredate)
+                               from exam_emp
+                               where deptno=60)
+ )
+and deptno=60;
+
+select * from exam_salgrade where grade = 5;
+
+delete from exam_emp
+where empno in (
+ select e.empno
+ from exam_emp e, exam_salgrade s
+ where e.sal between s.losal and s.hisal and s.grade =5
+);
+
+--test finish
+
+--transection 
+
+create table dept_tcl as select * from dept;
+
+insert into dept_tcl values(50,'DATABASE','SEOUL');
+
+update dept_tcl set loc='BUSAN' where deptno =40;
+
+delete from dept_tcl where dname = 'RESEARCH';
+
+select * from dept_tcl;
+
+rollback;
+
+commit;
+
+
+--session
+
+select * from dept_tcl;
+
+delete from dept_tcl where deptno = 50;
+
+commit;
+
+update dept_tcl set loc = 'SEOUL'
+where deptno = 30;
+
+
+--DDL(Data definition language)
+--create table [TABLE NAME](FIELDNAME VALUETYPE,FIELDNAME VALUETYPE ....);
+
+create table emp_ddl(
+    empno number(4),
+    ename varchar2(10),
+    job varchar2(9),
+    mgr number(4),
+    hiredate date,
+    sal number(7,2),
+    comm number(7,2),
+    dep number(2)
+);
+
+create table test(
+    id number(4),
+    name varchar2(3)
+);
+
+desc test;
+
+insert into test(id,name) values(10,'mr.hong');
+insert into test(id,name) values(10,'kim');
+
+select * from test;
+
+create table test2(
+    id number(4),
+    name nchar(3)
+);
+
+insert into test2(id,name) values(10,'테이블');
+insert into test2(id,name) values(10,'kim');
+
+select * from test2 where name = 'kim';
+
+create table test3(
+    id number(4),
+    name nvarchar2(3)
+);
+
+insert into test3(id,name) values(10,'테이블');
+insert into test3(id,name) values(10,'kim');
+
+create table dept_ddl as select *from dept;
+
+create table dept_ddl_30 as select *from dept where deptno=30;
+
+select * from dept_ddl;
+select * from dept_ddl_30;
+select * from dept_ddl2;
+
+
+create table dept_ddl2 as select *from dept where 1<>1;
+
+
+--DROP
+drop table dept_ddl2;
+
+
+--ALTER
+CREATE TABLE EMP_ALTER as select * from emp;
+select * from emp_alter;
+desc emp_alter;
+ALTER TABLE emp_alter ADD HP varchar2(20);
+ALTER TABLE emp_alter rename column hp to tel;
+ALTER TABLE emp_alter modify empno number(5);
+ALTER TABLE emp_alter DROP COLUMN tel;
+RENAME emp_alter to emp_raname;
 
 
 
 
+--test
 
+select * from member;
+desc member;
+create table member(
+    id nchar(8),
+    name nvarchar2(10),
+    addr nvarchar2(50),
+    nation nchar(4),
+    email nvarchar2(50),
+    age number(7,2)
+);
 
+alter table member add bigo varchar2(20);
+alter table member modify addr nvarchar2(50);
+alter table member modify id nchar(8);
+alter table member rename column bigo to remark;
+
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1234','홍길동','서울시 구로구 개봉동','대한민국','hong123@naver.com',25);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1235','이승기','서울시 강서구 화곡동','대한민국','lee@naver.com',26);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1236','강호동','서울시 마포구 상수동','대한민국','kang56@naver.com',42);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1237','이수근','경기도 부천시','대한민국','leesu@naver.com',42);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1238','서장훈','서울시 강남구 대치동','대한민국','seo568@google.com',36);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1239','김영철','서울시 도봉구 도봉동','대한민국','young@naver.com',41);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1210','김장훈','서울시 노원구 노원1동','대한민국','kim@naver.com',48);    
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1211','임창정','서울시 양천구 신월동','대한민국','limchang@naver.com',45);    
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1212','김종국','서울시 강남구 도곡동','대한민국','kimjong@naver.com',44);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1213','김범수','경기도 일산동구 일산동','대한민국','kim77@naver.com',36);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1214','김경호','인천시 서구 가좌동','대한민국','ho789@naver.com',26);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1215','민경훈','서울시 수원시 수원1동','대한민국','min@naver.com',35);
+insert into member(id,name,addr,nation,email,age) 
+    values('hong1216','바이브','서울시 용인시 기흥구','대한민국','vibe@naver.com',33);
+
+update member set remark = ' ';
+
+drop table member;
 
 
 
