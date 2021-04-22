@@ -835,5 +835,232 @@ update member set remark = ' ';
 
 drop table member;
 
+-- test finish
+
+--data dictionary
+
+select * from dict;
+select * from USER_INDEXES;
+
+
+create index IDX_EMP_SAL on EMP(SAL);
+drop index IDX_EMP_SAL;
+
+
+create table usertbl(
+    USERID char(8) not null primary key,
+    USERNAME nvarchar2(10) not null,
+    BIRTHYEAR number(4) not null,
+    MOBILE char(3)
+);
+
+select INDEX_NAME,UNIQUENESS,INDEX_TYPE from USER_INDEXES;
+
+select * from emp where sal = 1600;
+
+create view VM_EMP20 
+    as (select empno,ename,job,deptno from emp where deptno=20);
+    
+select * from vm_emp20;
+select * from emp;
+
+select *from user_views;
+
+drop view vm_emp20;
+
+insert into vm_emp20 values(7903,'James','MANAGER',20);
+
+create view VM_EMP_READ as select empno,ename,job 
+from emp with read only;
+
+select * from vm_emp_read;
+
+insert into vm_emp_read values(8000,'Mr.Hong','ANALYST');
+
+
+create table temp(
+ col1 varchar2(20),
+ col2 varchar2(20)
+ );
+
+
+grant select,insert on temp to test;
+
+select * from temp;
+
+revoke insert on temp from test;
+
+
+create table tab_notnull(
+    login_id varchar2(20) not null,
+    login_pwd varchar2(20) not null,
+    tel varchar2(20)
+);
+
+insert into tab_notnull(login_id,login_pwd,tel)
+values('test_id01','test_pwd01',null);
+insert into tab_notnull(login_id,login_pwd)
+values('test_id02','test_pwd02');
+
+
+--check requirement name
+select * from user_constraints;
+--insert requirement name
+create table tab_notnull2(
+    login_id varchar2(20) constraint TBL_NN2_LOGID_NN not null,
+    login_pwd varchar2(20) constraint TBL_NN2_LOGPWD_NN not null,
+    tel varchar2(20)
+);
+--change requirment name(with field name)
+alter table tab_notnull2 
+modify(tel constraint TBL_NN2_TEL_NN not null);
+
+--change requirment name
+alter table tab_notnull2 
+rename constraint TBL_NN2_TEL_NN to TBL_NN2_TEL_NON;
+
+--remove requirment
+alter table tab_notnull2 
+drop constraint TBL_NN2_TEL_NON;
+
+--show tables
+desc tab_notnull2;
+
+
+
+
+--unique
+create table tab_unique(
+    login_id varchar2(20) unique,
+    login_pwd varchar2(20) not null,
+    tel varchar2(20)
+);
+
+select * from tab_unique;
+
+insert into tab_unique(login_id, login_pwd, tel)
+values('h123','h123','01012345678');
+insert into tab_unique(login_id, login_pwd, tel)
+values('h124','h123','01012345678');
+delete from tab_unique where login_id = 'h123';
+
+--primary key = not null + unique
+create table tab_pk(
+    login_id varchar2(20) primary key,
+    login_pwd varchar2(20) not null,
+    tel varchar2(20)
+);
+insert into tab_pk(login_id, login_pwd, tel)
+values('h123','h123','01012345678');
+delete from tab_pk where login_id = 'h123';
+
+create table tab_pk2(
+    login_id varchar2(20) constraint TAB_PK_LOGID_PK primary key,
+    login_pwd varchar2(20) not null,
+    tel varchar2(20)
+);
+
+drop table tab_pk2;
+
+create table tab_const(
+    id varchar2(20), 
+    pwd varchar2(20),
+    tel varchar2(20),
+    constraint TAB_CST_ID_PK primary key(id),
+    constraint TAB_CST_TEL_UNQ unique(tel)
+);
+
+
+--foreign key
+select * from emp;
+insert into emp(empno,ename,job,mgr,hiredate,sal,comm,deptno)
+values(9999,'홍길동','CLERK','7788',sysdate,1200,null,50);
+
+create table dept_fk(
+    deptno number(2) constraint DEPTFK_DEPTNO_PK primary key,
+    dname varchar2(14),
+    loc varchar2(13)
+);
+
+create table emp_fk(
+    empno number(4) constraint EMPFK_EMPNO_PK primary key,
+    ename varchar2(10),
+    job varchar2(9),
+    mgr number(4),
+    hiredate date,
+    sal number(7,2),
+    comm number(7,2),
+    deptno number(2) constraint EMPFK_DEPTNO_fK 
+        references dept_fk(deptno)
+        on delete cascade
+);
+
+insert into dept_fk values(50,'DATABASE','SEOUL');
+
+insert into emp_fk(empno,ename,job,mgr,hiredate,sal,comm,deptno)
+values(9999,'홍길동','CLERK','7788',sysdate,1200,null,50);
+
+--you cant delete pk value when it use fk in other table
+-- so, delete in other table where use pk for fk
+-- or take code in create empfk, 'on delete cascade' or 'on delete set null'
+delete from emp_fk where empno=9999;
+delete from dept_fk where deptno=50;
+
+drop table emp_fk;
+
+
+--default
+select * from tab_df;
+
+create table tab_df(
+    login_id varchar2(20) constraint TABDF_LOGID_PK primary key,
+    login_pwd varchar2(20) default '1234',
+    tel varchar2(20)
+);
+
+insert into tab_df(login_id,tel) values('test','01045213131');
+
+
+
+
+--test
+--1. dept_const
+create table dept_const(
+    deptno number(2) constraint DEPTCONST_DEPTNO_PK primary key,
+    dname varchar2(14) constraint DEPTCONST_DNAME_UNQ unique,
+    loc varchar2(13) constraint DEPTCONST_LOC_NN not null
+);
+--2. emp_const
+create table emp_const(
+    empno number(4) constraint EMPCONST_EMPNO_PK primary key,
+    ename VARCHAR2(10) constraint EMPCONST_ENAME_NN not null,
+    job varchar2(9),
+    tel varchar2(20) constraint EMPCONST_TEL_UNQ unique,
+    hirdate DATE,
+    sal number(7,2),
+    deptno number(2) constraint EMPCONST_DEPTNO_FK
+    references dept_const(deptno)
+);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
